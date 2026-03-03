@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Crush | Image Puzzle Pro</title>
+    <title>NeuroTiles | Daily Puzzle Challenge</title>
     <style>
         :root {
-            --primary: #ff3e3e; /* Core Crush Red */
-            --bg: #0f0f0f;
-            --surface: #1e1e1e;
+            /* NeuroTiles Theme: Cyberpunk Purple/Cyan */
+            --primary: #bc13fe; 
+            --primary-hover: #d35aff;
+            --secondary: #00f3ff;
+            --bg: #0b0b15;
+            --surface: #161625;
             --text: #ffffff;
-            --accent: #2a2a2a;
+            --accent: #232336;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,14 +45,16 @@
         .brand-logo {
             font-size: 28px;
             font-weight: 900;
-            color: var(--primary);
+            color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
             gap: 10px;
+            text-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
         }
+        .brand-logo span { color: var(--primary); }
 
         .left-panel { flex: 1; max-width: 320px; }
         
@@ -74,7 +79,7 @@
         .level-select {
             margin: 20px 0;
             display: flex;
-            background: #111;
+            background: #08080f;
             padding: 5px;
             border-radius: 50px;
             justify-content: space-between;
@@ -94,26 +99,41 @@
         .level-btn.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 62, 62, 0.3);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
         }
 
         /* Visual Hint & Crop */
         .visual-hint { margin-top: 20px; }
-        .visual-hint p { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .visual-hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .visual-hint p { font-size: 12px; color: #aaa; margin: 0; }
+        .badge { background: var(--secondary); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        
+        .preview-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+        }
         .preview-image {
             width: 100%;
+            height: 100%;
             border-radius: 12px;
             border: 2px solid #333;
-            aspect-ratio: 1/1;
             object-fit: cover;
+        }
+        .loader {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary);
+            font-weight: bold;
+            display: none;
         }
 
         .crop-controls {
-            background: #111;
+            background: #08080f;
             padding: 12px;
             border-radius: 10px;
             margin-top: 10px;
-            display: none;
         }
         .crop-controls label { font-size: 11px; color: #888; display: block; margin-bottom: 5px; }
         input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
@@ -127,10 +147,8 @@
             background: #000;
             padding: 5px;
             border-radius: 12px;
-            box-shadow: 0 0 40px rgba(255, 62, 62, 0.15);
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.15);
             border: 2px solid #222;
-            
-            /* Touch fixes */
             touch-action: manipulation; 
             user-select: none;
             -webkit-user-select: none;
@@ -142,25 +160,21 @@
             background-repeat: no-repeat;
             transition: transform 0.1s ease-out;
             border-radius: 4px;
-            
-            /* Text highlight fixes */
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
         }
-        .puzzle-tile:hover:not(.empty-tile) { filter: brightness(1.2); z-index: 10; }
+        .puzzle-tile:hover:not(.empty-tile) { filter: brightness(1.2); z-index: 10; border: 1px solid var(--secondary); }
 
         .tile-number {
             position: absolute;
             top: 6px; right: 6px;
-            background: rgba(0,0,0,0.6);
-            color: #fff;
+            background: rgba(0,0,0,0.7);
+            color: var(--secondary);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 11px;
             font-weight: bold;
-            
-            /* Ignore clicks on number */
             pointer-events: none !important; 
         }
 
@@ -180,16 +194,17 @@
             letter-spacing: 1px;
             transition: 0.3s;
         }
-        .btn:hover { background: #ff5555; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 62, 62, 0.4); }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
+        
         .btn-secondary { background: transparent; border: 2px solid #333; color: #aaa; }
-        .btn-secondary:hover { border-color: #555; color: #fff; background: transparent; }
+        .btn-secondary:hover { border-color: var(--secondary); color: #fff; background: rgba(0, 243, 255, 0.05); }
 
         /* Win Message */
         .message {
             position: fixed;
             top: 20px;
-            background: #28a745;
-            color: white;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #000;
             padding: 15px 40px;
             border-radius: 50px;
             font-weight: 800;
@@ -204,17 +219,17 @@
         @media (max-width: 900px) {
             .main-container { flex-direction: column; padding: 20px; }
             .left-panel { max-width: 100%; }
-            .puzzle-grid { transform: scale(0.8); }
+            .puzzle-grid { transform: scale(0.95); }
         }
     </style>
 </head>
 <body>
 
-<div id="winMsg" class="message">🏆 CORE CRUSH CHAMPION! 🏆</div>
+<div id="winMsg" class="message">🧠 NEURAL PATHWAY CONNECTED!</div>
 
 <div class="main-container">
     <div class="left-panel">
-        <div class="brand-logo">🔴 Core Crush</div>
+        <div class="brand-logo">🧠 Neuro<span>Tiles</span></div>
         
         <div class="stats-container">
             <div class="stat-card">
@@ -234,8 +249,15 @@
         </div>
 
         <div class="visual-hint">
-            <p>Reference Image:</p>
-            <img id="previewImage" class="preview-image" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&h=500&fit=crop" alt="Hint">
+            <div class="visual-hint-header">
+                <p>Target Image:</p>
+                <span id="imgSourceLabel" class="badge">Daily Challenge</span>
+            </div>
+            
+            <div class="preview-wrapper">
+                <div id="loadingText" class="loader">Loading...</div>
+                <img id="previewImage" class="preview-image" src="" alt="Hint">
+            </div>
             
             <div id="cropControls" class="crop-controls">
                 <label>Adjust View Area:</label>
@@ -245,12 +267,15 @@
 
         <div class="btn-group">
             <button class="btn" onclick="shuffleTiles()">🔀 Scramble Puzzle</button>
+            
+            <button class="btn btn-secondary" onclick="loadRandomImage()">🎲 Random Challenge</button>
+            
             <label for="imageUpload" class="btn btn-secondary" style="display: block; text-align: center;">🖼️ Upload Photo</label>
             <input type="file" id="imageUpload" accept="image/*" style="display: none;">
         </div>
         
-        <p style="font-size: 11px; color: #444; margin-top: 15px; line-height: 1.4;">
-            Instructions: Click tiles adjacent to the empty spot to move them, or use Arrow Keys. Solve the puzzle to see the full image!
+        <p style="font-size: 11px; color: #555; margin-top: 15px; line-height: 1.4; text-align:center;">
+            Connect adjacent tiles or use Arrow Keys.
         </p>
     </div>
 
@@ -268,17 +293,20 @@
     let seconds = 0;
     let gameStarted = false;
     let solved = false;
-    let currentImageBase = document.getElementById('previewImage').src;
-    let rawImage = null;
+    let currentImageBase = ''; // Stores the Base64 of the processed image
+    let rawImage = new Image(); // Stores the raw loaded image object
 
     const gridEl = document.getElementById('puzzleGrid');
     const movesEl = document.getElementById('moves');
     const timerEl = document.getElementById('timer');
     const winMsg = document.getElementById('winMsg');
     const panRange = document.getElementById('panRange');
-    const cropControls = document.getElementById('cropControls');
+    const previewImg = document.getElementById('previewImage');
+    const labelEl = document.getElementById('imgSourceLabel');
+    const loader = document.getElementById('loadingText');
 
-    // Setup Game
+    // --- 1. GAME LOGIC ---
+
     function initGame() {
         tiles = Array.from({length: gridSize * gridSize}, (_, i) => i);
         emptyIndex = tiles.length - 1;
@@ -293,9 +321,11 @@
         render();
     }
 
-    // Render Grid
     function render() {
-        const totalSize = 450; 
+        // Adjust grid size for mobile vs desktop
+        const isMobile = window.innerWidth < 600;
+        const totalSize = isMobile ? 300 : 450; 
+        
         const tileSize = totalSize / gridSize;
         gridEl.style.gridTemplateColumns = `repeat(${gridSize}, ${tileSize}px)`;
         gridEl.style.gridTemplateRows = `repeat(${gridSize}, ${tileSize}px)`;
@@ -312,6 +342,8 @@
             } else {
                 const row = Math.floor(tileValue / gridSize);
                 const col = tileValue % gridSize;
+                
+                // Use the processed canvas data
                 tile.style.backgroundImage = `url(${currentImageBase})`;
                 tile.style.backgroundSize = `${totalSize}px ${totalSize}px`;
                 tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
@@ -356,8 +388,8 @@
 
     function shuffleTiles() {
         initGame();
-        // Solvable shuffle
-        for (let i = 0; i < gridSize * gridSize * 20; i++) {
+        // Solvable shuffle algorithm
+        for (let i = 0; i < gridSize * gridSize * 25; i++) {
             const neighbors = [];
             if (emptyIndex >= gridSize) neighbors.push(emptyIndex - gridSize);
             if (emptyIndex < gridSize * (gridSize - 1)) neighbors.push(emptyIndex + gridSize);
@@ -386,6 +418,114 @@
         shuffleTiles();
     }
 
+    // --- 2. IMAGE HANDLING LOGIC ---
+
+    // 2a. Daily Challenge Logic
+    function loadDailyImage() {
+        labelEl.textContent = "Daily Challenge";
+        labelEl.style.background = "#00f3ff"; 
+        
+        const date = new Date();
+        // Create a seed string based on Date (YYYY-MM-DD) so it updates every 24hrs
+        const seed = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+        const url = `https://picsum.photos/seed/${seed}/800/800`;
+        
+        loadImageFromURL(url);
+    }
+
+    // 2b. Random Image Logic
+    function loadRandomImage() {
+        labelEl.textContent = "Random Challenge";
+        labelEl.style.background = "#bc13fe";
+        
+        // Random seed
+        const seed = Math.floor(Math.random() * 100000);
+        const url = `https://picsum.photos/seed/${seed}/800/800`;
+        
+        loadImageFromURL(url);
+    }
+
+    // Common function to load from URL (Daily or Random)
+    function loadImageFromURL(url) {
+        loader.style.display = 'block';
+        previewImg.style.opacity = '0.3';
+        
+        rawImage = new Image();
+        rawImage.crossOrigin = "Anonymous"; // Crucial for editing canvas with external images
+        
+        rawImage.onload = () => {
+            loader.style.display = 'none';
+            previewImg.style.opacity = '1';
+            panRange.value = 50; // Reset pan
+            processImage();
+        };
+        
+        rawImage.onerror = () => {
+            alert("Failed to load image. Check internet connection.");
+        };
+        
+        rawImage.src = url;
+    }
+
+    // 2c. Upload Logic
+    document.getElementById('imageUpload').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        labelEl.textContent = "Custom Upload";
+        labelEl.style.background = "#fff";
+        
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            rawImage = new Image();
+            rawImage.onload = () => {
+                panRange.value = 50;
+                processImage();
+            };
+            rawImage.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // 2d. Processing (Cropping/Centering)
+    panRange.oninput = processImage;
+
+    function processImage() {
+        if (!rawImage.src) return;
+
+        const canvas = document.createElement('canvas');
+        // We use a square canvas for the game
+        const size = 600; 
+        canvas.width = size; canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // Calculate aspect ratio crop
+        let minDim = Math.min(rawImage.width, rawImage.height);
+        let sx = 0, sy = 0;
+        
+        // Pan logic based on slider (0 to 1)
+        let val = panRange.value / 100;
+
+        if (rawImage.width > rawImage.height) {
+            // Landscape: slide horizontally
+            const maxScroll = rawImage.width - minDim;
+            sx = maxScroll * val;
+        } else {
+            // Portrait: slide vertically
+            const maxScroll = rawImage.height - minDim;
+            sy = maxScroll * val;
+        }
+
+        // Draw cropped portion to canvas
+        ctx.drawImage(rawImage, sx, sy, minDim, minDim, 0, 0, size, size);
+        
+        // Export to Base64 for CSS usage
+        currentImageBase = canvas.toDataURL();
+        previewImg.src = currentImageBase;
+        
+        shuffleTiles(); // Reset game with new image
+    }
+
     // Keyboard Controls
     document.addEventListener('keydown', (e) => {
         if(solved) return;
@@ -397,48 +537,9 @@
         if (move !== -1) { e.preventDefault(); moveTile(move); }
     });
 
-    // Image & Cropping
-    document.getElementById('imageUpload').onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            rawImage = new Image();
-            rawImage.onload = () => {
-                cropControls.style.display = 'block';
-                processImage();
-            };
-            rawImage.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-    };
+    // Start Game on Load
+    window.onload = loadDailyImage;
 
-    panRange.oninput = processImage;
-
-    function processImage() {
-        if (!rawImage) return;
-        const canvas = document.createElement('canvas');
-        canvas.width = 500; canvas.height = 500;
-        const ctx = canvas.getContext('2d');
-        
-        let minDim = Math.min(rawImage.width, rawImage.height);
-        let sx = 0, sy = 0;
-        let val = panRange.value / 100;
-
-        if (rawImage.width > rawImage.height) {
-            sx = (rawImage.width - minDim) * val;
-        } else {
-            sy = (rawImage.height - minDim) * val;
-        }
-
-        ctx.drawImage(rawImage, sx, sy, minDim, minDim, 0, 0, 500, 500);
-        currentImageBase = canvas.toDataURL();
-        document.getElementById('previewImage').src = currentImageBase;
-        shuffleTiles();
-    }
-
-    // Initial shuffle on load
-    setTimeout(shuffleTiles, 100);
 </script>
 
 </body>
