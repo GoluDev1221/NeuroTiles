@@ -293,8 +293,8 @@
     let seconds = 0;
     let gameStarted = false;
     let solved = false;
-    let currentImageBase = ''; // Stores the Base64 of the processed image
-    let rawImage = new Image(); // Stores the raw loaded image object
+    let currentImageBase = ''; 
+    let rawImage = new Image(); 
 
     const gridEl = document.getElementById('puzzleGrid');
     const movesEl = document.getElementById('moves');
@@ -322,7 +322,8 @@
     }
 
     function render() {
-        // Adjust grid size for mobile vs desktop
+        if (tiles.length === 0) return; // Guard clause
+
         const isMobile = window.innerWidth < 600;
         const totalSize = isMobile ? 300 : 450; 
         
@@ -388,7 +389,6 @@
 
     function shuffleTiles() {
         initGame();
-        // Solvable shuffle algorithm
         for (let i = 0; i < gridSize * gridSize * 25; i++) {
             const neighbors = [];
             if (emptyIndex >= gridSize) neighbors.push(emptyIndex - gridSize);
@@ -420,44 +420,38 @@
 
     // --- 2. IMAGE HANDLING LOGIC ---
 
-    // 2a. Daily Challenge Logic
     function loadDailyImage() {
         labelEl.textContent = "Daily Challenge";
         labelEl.style.background = "#00f3ff"; 
         
         const date = new Date();
-        // Create a seed string based on Date (YYYY-MM-DD) so it updates every 24hrs
         const seed = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
         const url = `https://picsum.photos/seed/${seed}/800/800`;
         
         loadImageFromURL(url);
     }
 
-    // 2b. Random Image Logic
     function loadRandomImage() {
         labelEl.textContent = "Random Challenge";
         labelEl.style.background = "#bc13fe";
-        
-        // Random seed
         const seed = Math.floor(Math.random() * 100000);
         const url = `https://picsum.photos/seed/${seed}/800/800`;
-        
         loadImageFromURL(url);
     }
 
-    // Common function to load from URL (Daily or Random)
     function loadImageFromURL(url) {
         loader.style.display = 'block';
         previewImg.style.opacity = '0.3';
         
         rawImage = new Image();
-        rawImage.crossOrigin = "Anonymous"; // Crucial for editing canvas with external images
+        rawImage.crossOrigin = "Anonymous"; 
         
         rawImage.onload = () => {
             loader.style.display = 'none';
             previewImg.style.opacity = '1';
-            panRange.value = 50; // Reset pan
+            panRange.value = 50; 
             processImage();
+            shuffleTiles(); // New Image = Scramble
         };
         
         rawImage.onerror = () => {
@@ -467,7 +461,6 @@
         rawImage.src = url;
     }
 
-    // 2c. Upload Logic
     document.getElementById('imageUpload').onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -481,49 +474,44 @@
             rawImage.onload = () => {
                 panRange.value = 50;
                 processImage();
+                shuffleTiles(); // New Upload = Scramble
             };
             rawImage.src = ev.target.result;
         };
         reader.readAsDataURL(file);
     };
 
-    // 2d. Processing (Cropping/Centering)
-    panRange.oninput = processImage;
+    // When Slider moves, ONLY render (do not scramble)
+    panRange.oninput = () => {
+        processImage();
+        render(); 
+    };
 
     function processImage() {
         if (!rawImage.src) return;
 
         const canvas = document.createElement('canvas');
-        // We use a square canvas for the game
         const size = 600; 
         canvas.width = size; canvas.height = size;
         const ctx = canvas.getContext('2d');
         
-        // Calculate aspect ratio crop
         let minDim = Math.min(rawImage.width, rawImage.height);
         let sx = 0, sy = 0;
-        
-        // Pan logic based on slider (0 to 1)
         let val = panRange.value / 100;
 
         if (rawImage.width > rawImage.height) {
-            // Landscape: slide horizontally
             const maxScroll = rawImage.width - minDim;
             sx = maxScroll * val;
         } else {
-            // Portrait: slide vertically
             const maxScroll = rawImage.height - minDim;
             sy = maxScroll * val;
         }
 
-        // Draw cropped portion to canvas
         ctx.drawImage(rawImage, sx, sy, minDim, minDim, 0, 0, size, size);
         
-        // Export to Base64 for CSS usage
         currentImageBase = canvas.toDataURL();
         previewImg.src = currentImageBase;
-        
-        shuffleTiles(); // Reset game with new image
+        // Does NOT call shuffleTiles() anymore
     }
 
     // Keyboard Controls
@@ -537,7 +525,6 @@
         if (move !== -1) { e.preventDefault(); moveTile(move); }
     });
 
-    // Start Game on Load
     window.onload = loadDailyImage;
 
 </script>
