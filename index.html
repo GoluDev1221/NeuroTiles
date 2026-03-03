@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroTiles | Daily Puzzle Challenge</title>
+    <title>NeuroTiles | Cyberpunk Puzzle</title>
     <style>
         :root {
-            /* NeuroTiles Theme: Cyberpunk Purple/Cyan */
+            /* NeuroTiles Theme */
             --primary: #bc13fe; 
             --primary-hover: #d35aff;
             --secondary: #00f3ff;
@@ -14,6 +14,7 @@
             --surface: #161625;
             --text: #ffffff;
             --accent: #232336;
+            --danger: #ff2a2a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,11 +28,12 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            overflow: hidden; /* Prevent scrolling on mobile */
         }
 
+        /* --- LAYOUT CONTAINERS --- */
         .main-container {
-            display: flex;
-            gap: 40px;
+            position: relative;
             max-width: 1100px;
             width: 100%;
             background: var(--surface);
@@ -39,119 +41,137 @@
             border-radius: 24px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             border: 1px solid #333;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        /* Branding Section */
-        .brand-logo {
-            font-size: 28px;
-            font-weight: 900;
-            color: var(--text);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .screen.active {
             display: flex;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HOME SCREEN STYLES --- */
+        #homeScreen {
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            text-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
+            justify-content: center;
+            text-align: center;
+            gap: 30px;
         }
-        .brand-logo span { color: var(--primary); }
 
-        .left-panel { flex: 1; max-width: 320px; }
-        
-        /* Stats Dashboard */
-        .stats-container {
-            display: flex;
-            gap: 12px;
+        .hero-title {
+            font-size: 60px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
+        }
+        .hero-title span { color: var(--primary); }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
             margin-bottom: 20px;
         }
+
+        .setting-box {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #333;
+            text-align: left;
+        }
+        .setting-box label { display: block; color: var(--secondary); margin-bottom: 10px; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #0b0b15;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+        select:focus { border-color: var(--primary); }
+
+        .play-btn {
+            background: linear-gradient(90deg, var(--primary), #8a00c2);
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            padding: 15px 80px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
+        }
+        .play-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(188, 19, 254, 0.6); }
+
+        /* --- GAME SCREEN STYLES --- */
+        #gameScreen {
+            gap: 40px;
+            height: 100%;
+        }
+
+        .left-panel { flex: 1; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
+        .right-panel { flex: 2; display: flex; align-items: center; justify-content: center; }
+
+        /* Stats */
+        .stats-container { display: flex; gap: 12px; }
         .stat-card {
             background: var(--accent);
-            padding: 15px;
+            padding: 10px;
             border-radius: 12px;
             flex: 1;
             text-align: center;
-            border-bottom: 4px solid var(--primary);
+            border-bottom: 3px solid var(--primary);
         }
-        .stat-value { font-size: 22px; font-weight: 800; display: block; color: #fff; }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+        .stat-value { font-size: 18px; font-weight: 800; display: block; color: #fff; }
+        .stat-label { font-size: 9px; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+        .danger-text { color: var(--danger) !important; animation: pulse 1s infinite; }
 
-        /* Level Selector */
-        .level-select {
-            margin: 20px 0;
-            display: flex;
-            background: #08080f;
-            padding: 5px;
-            border-radius: 50px;
-            justify-content: space-between;
-        }
-        .level-btn {
-            background: transparent;
-            border: none;
-            color: #888;
-            padding: 8px 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: 0.3s;
-            flex: 1;
-        }
-        .level-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Visual Hint & Crop */
-        .visual-hint { margin-top: 20px; }
-        .visual-hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
-        .visual-hint p { font-size: 12px; color: #aaa; margin: 0; }
+        /* Visual Hint */
+        .visual-hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .badge { background: var(--secondary); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         
-        .preview-wrapper {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1/1;
-        }
-        .preview-image {
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-            border: 2px solid #333;
-            object-fit: cover;
-        }
-        .loader {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--primary);
-            font-weight: bold;
-            display: none;
-        }
-
-        .crop-controls {
-            background: #08080f;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-        .crop-controls label { font-size: 11px; color: #888; display: block; margin-bottom: 5px; }
+        .preview-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; max-height: 200px; }
+        .preview-image { width: 100%; height: 100%; border-radius: 12px; border: 2px solid #333; object-fit: cover; }
+        
+        .crop-controls { background: #08080f; padding: 10px; border-radius: 10px; }
+        .crop-controls label { font-size: 10px; color: #888; display: block; margin-bottom: 5px; }
         input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
 
-        /* Game Grid */
-        .right-panel { flex: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
+        /* Puzzle Grid */
         .puzzle-grid {
             display: grid;
-            gap: 5px;
+            gap: 4px;
             background: #000;
-            padding: 5px;
+            padding: 4px;
             border-radius: 12px;
             box-shadow: 0 0 50px rgba(188, 19, 254, 0.15);
             border: 2px solid #222;
             touch-action: manipulation; 
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .puzzle-tile {
@@ -160,174 +180,330 @@
             background-repeat: no-repeat;
             transition: transform 0.1s ease-out;
             border-radius: 4px;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
         }
         .puzzle-tile:hover:not(.empty-tile) { filter: brightness(1.2); z-index: 10; border: 1px solid var(--secondary); }
 
         .tile-number {
-            position: absolute;
-            top: 6px; right: 6px;
-            background: rgba(0,0,0,0.7);
-            color: var(--secondary);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            pointer-events: none !important; 
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,0.7); color: var(--secondary);
+            padding: 1px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; pointer-events: none;
         }
-
-        .empty-tile { background: transparent !important; box-shadow: inset 0 0 10px rgba(255,255,255,0.05); }
+        .empty-tile { background: transparent !important; }
 
         /* Buttons */
-        .btn-group { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; width: 100%; }
         .btn {
-            background: var(--primary);
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
+            background: var(--accent); color: white; padding: 10px; border: 1px solid #444;
+            border-radius: 8px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 12px; transition: 0.2s; width: 100%;
         }
-        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
-        
-        .btn-secondary { background: transparent; border: 2px solid #333; color: #aaa; }
-        .btn-secondary:hover { border-color: var(--secondary); color: #fff; background: rgba(0, 243, 255, 0.05); }
+        .btn:hover { background: #333; border-color: var(--secondary); }
+        .btn-primary { background: var(--primary); border: none; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { color: #ff6666; border-color: #552222; margin-top: auto; }
+        .btn-danger:hover { background: #220000; border-color: red; }
 
-        /* Win Message */
-        .message {
-            position: fixed;
-            top: 20px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: #000;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 800;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1000;
-            animation: slideDown 0.5s ease;
+        /* MODAL (Win/Lose) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
+        .modal-content {
+            background: var(--surface); padding: 40px; border-radius: 20px;
+            text-align: center; border: 2px solid var(--primary);
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.5);
+            max-width: 400px; width: 90%;
+        }
+        .modal-title { font-size: 32px; font-weight: 900; margin-bottom: 10px; }
+        .modal-msg { color: #aaa; margin-bottom: 30px; }
+        .win-title { color: var(--secondary); }
+        .lose-title { color: var(--danger); }
 
-        @keyframes slideDown { from { top: -100px; } to { top: 20px; } }
-
+        /* Mobile Responsive */
         @media (max-width: 900px) {
-            .main-container { flex-direction: column; padding: 20px; }
-            .left-panel { max-width: 100%; }
+            .main-container { padding: 15px; min-height: 100vh; border-radius: 0; border: none; }
+            #gameScreen { flex-direction: column; overflow-y: auto; }
+            .left-panel { max-width: 100%; order: 2; }
+            .right-panel { order: 1; margin-bottom: 20px; }
+            .settings-grid { grid-template-columns: 1fr; }
             .puzzle-grid { transform: scale(0.95); }
         }
     </style>
 </head>
 <body>
 
-<div id="winMsg" class="message">🧠 NEURAL PATHWAY CONNECTED!</div>
-
 <div class="main-container">
-    <div class="left-panel">
+    <div id="homeScreen" class="screen active">
         <div class="brand-logo">🧠 Neuro<span>Tiles</span></div>
+        <h1 class="hero-title">Core<br><span>Crush</span></h1>
         
-        <div class="stats-container">
-            <div class="stat-card">
-                <span class="stat-value" id="timer">00:00</span>
-                <span class="stat-label">Timer</span>
+        <div class="settings-grid">
+            <div class="setting-box">
+                <label>Select Mode</label>
+                <select id="diffSelect">
+                    <option value="3">Easy (3x3)</option>
+                    <option value="4" selected>Medium (4x4)</option>
+                    <option value="5">Hard (5x5)</option>
+                </select>
             </div>
-            <div class="stat-card">
-                <span class="stat-value" id="moves">0</span>
-                <span class="stat-label">Moves</span>
+            <div class="setting-box">
+                <label>Time Limit</label>
+                <select id="timeSelect">
+                    <option value="0">Infinite</option>
+                    <option value="60">1 Minute</option>
+                    <option value="120">2 Minutes</option>
+                    <option value="300">5 Minutes</option>
+                </select>
             </div>
-        </div>
-
-        <div class="level-select">
-            <button class="level-btn active" onclick="changeLevel(3, this)">Easy</button>
-            <button class="level-btn" onclick="changeLevel(4, this)">Medium</button>
-            <button class="level-btn" onclick="changeLevel(5, this)">Hard</button>
-        </div>
-
-        <div class="visual-hint">
-            <div class="visual-hint-header">
-                <p>Target Image:</p>
-                <span id="imgSourceLabel" class="badge">Daily Challenge</span>
-            </div>
-            
-            <div class="preview-wrapper">
-                <div id="loadingText" class="loader">Loading...</div>
-                <img id="previewImage" class="preview-image" src="" alt="Hint">
-            </div>
-            
-            <div id="cropControls" class="crop-controls">
-                <label>Adjust View Area:</label>
-                <input type="range" id="panRange" min="0" max="100" value="50">
+            <div class="setting-box">
+                <label>Moves Limit</label>
+                <select id="moveSelect">
+                    <option value="0">Infinite</option>
+                    <option value="50">50 Moves</option>
+                    <option value="100">100 Moves</option>
+                    <option value="200">200 Moves</option>
+                </select>
             </div>
         </div>
 
-        <div class="btn-group">
-            <button class="btn" onclick="shuffleTiles()">🔀 Scramble Puzzle</button>
-            
-            <button class="btn btn-secondary" onclick="loadRandomImage()">🎲 Random Challenge</button>
-            
-            <label for="imageUpload" class="btn btn-secondary" style="display: block; text-align: center;">🖼️ Upload Photo</label>
-            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-        </div>
-        
-        <p style="font-size: 11px; color: #555; margin-top: 15px; line-height: 1.4; text-align:center;">
-            Connect adjacent tiles or use Arrow Keys.
-        </p>
+        <button class="play-btn" onclick="startGame()">PLAY GAME</button>
     </div>
 
-    <div class="right-panel">
-        <div id="puzzleGrid" class="puzzle-grid"></div>
+    <div id="gameScreen" class="screen">
+        <div class="left-panel">
+            <div class="visual-hint-header">
+                <div class="brand-logo" style="font-size: 18px; margin: 0;">🧠 Neuro<span>Tiles</span></div>
+                <button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="goHome()">Exit</button>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-value" id="timerDisplay">00:00</span>
+                    <span class="stat-label">Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="movesDisplay">0</span>
+                    <span class="stat-label">Moves</span>
+                </div>
+            </div>
+
+            <div class="visual-hint">
+                <div class="visual-hint-header">
+                    <p>Reference:</p>
+                    <span id="imgSourceLabel" class="badge">Daily</span>
+                </div>
+                <div class="preview-wrapper">
+                    <img id="previewImage" class="preview-image" src="" alt="Hint">
+                </div>
+                <div id="cropControls" class="crop-controls" style="margin-top: 5px;">
+                    <label>Adjust View:</label>
+                    <input type="range" id="panRange" min="0" max="100" value="50">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-primary" onclick="shuffleTiles()">🔄 Scramble</button>
+                <button class="btn" onclick="loadRandomImage()">🎲 Random Img</button>
+                <label for="imageUpload" class="btn" style="text-align: center; display: block; margin: 0;">📂 Upload</label>
+            </div>
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            
+            <p style="font-size: 10px; color: #555; text-align:center;">Use Arrow Keys or Click tiles.</p>
+        </div>
+
+        <div class="right-panel">
+            <div id="puzzleGrid" class="puzzle-grid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="gameModal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="modalTitle" class="modal-title"></div>
+        <p id="modalMsg" class="modal-msg"></p>
+        <button class="play-btn" style="font-size: 16px; padding: 10px 40px;" onclick="goHome()">Back to Home</button>
+        <br><br>
+        <button class="btn btn-secondary" onclick="restartLevel()">Replay Level</button>
     </div>
 </div>
 
 <script>
+    // --- STATE VARIABLES ---
     let gridSize = 3;
     let tiles = [];
     let emptyIndex;
     let moves = 0;
+    let timerSeconds = 0;
     let timerInterval;
-    let seconds = 0;
-    let gameStarted = false;
-    let solved = false;
+    let gameActive = false;
     let currentImageBase = ''; 
     let rawImage = new Image(); 
+    
+    // Limits
+    let limitTime = 0; // 0 = infinite
+    let limitMoves = 0; // 0 = infinite
 
+    // DOM Elements
+    const homeScreen = document.getElementById('homeScreen');
+    const gameScreen = document.getElementById('gameScreen');
     const gridEl = document.getElementById('puzzleGrid');
-    const movesEl = document.getElementById('moves');
-    const timerEl = document.getElementById('timer');
-    const winMsg = document.getElementById('winMsg');
+    const movesDisplay = document.getElementById('movesDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
     const panRange = document.getElementById('panRange');
     const previewImg = document.getElementById('previewImage');
     const labelEl = document.getElementById('imgSourceLabel');
-    const loader = document.getElementById('loadingText');
+    const modal = document.getElementById('gameModal');
 
-    // --- 1. GAME LOGIC ---
+    // --- NAVIGATION ---
+    
+    function startGame() {
+        // Read Settings
+        gridSize = parseInt(document.getElementById('diffSelect').value);
+        limitTime = parseInt(document.getElementById('timeSelect').value);
+        limitMoves = parseInt(document.getElementById('moveSelect').value);
 
-    function initGame() {
+        // Switch Screens
+        homeScreen.classList.remove('active');
+        gameScreen.classList.add('active');
+
+        // Init
+        if(!rawImage.src) {
+            loadDailyImage(); // Load image if first time
+        } else {
+            restartLevel(); // Just reset tiles
+        }
+    }
+
+    function goHome() {
+        clearInterval(timerInterval);
+        modal.style.display = 'none';
+        gameScreen.classList.remove('active');
+        homeScreen.classList.add('active');
+    }
+
+    function restartLevel() {
+        modal.style.display = 'none';
+        panRange.value = 50; 
+        processImage(); // Re-render image
+        shuffleTiles(); // Re-scramble
+    }
+
+    // --- GAME LOGIC ---
+
+    function initGameStats() {
         tiles = Array.from({length: gridSize * gridSize}, (_, i) => i);
         emptyIndex = tiles.length - 1;
-        solved = false;
         moves = 0;
-        seconds = 0;
-        gameStarted = false;
+        timerSeconds = 0;
+        gameActive = true;
+        
         clearInterval(timerInterval);
-        movesEl.textContent = "0";
-        timerEl.textContent = "00:00";
-        winMsg.style.display = 'none';
+        updateStatsUI();
         render();
     }
 
+    function updateStatsUI() {
+        // Moves Logic
+        if (limitMoves > 0) {
+            movesDisplay.textContent = `${moves} / ${limitMoves}`;
+            if(moves >= limitMoves) movesDisplay.classList.add('danger-text');
+            else movesDisplay.classList.remove('danger-text');
+        } else {
+            movesDisplay.textContent = moves;
+        }
+
+        // Time Logic
+        let displaySec = limitTime > 0 ? (limitTime - timerSeconds) : timerSeconds;
+        if(displaySec < 0) displaySec = 0;
+        
+        const m = Math.floor(displaySec / 60).toString().padStart(2, '0');
+        const s = (displaySec % 60).toString().padStart(2, '0');
+        timerDisplay.textContent = `${m}:${s}`;
+        
+        if(limitTime > 0 && displaySec <= 10) timerDisplay.classList.add('danger-text');
+        else timerDisplay.classList.remove('danger-text');
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if(!gameActive) return;
+            timerSeconds++;
+            updateStatsUI();
+
+            // Check Time Loss
+            if (limitTime > 0 && timerSeconds >= limitTime) {
+                endGame(false, "Time's Up!");
+            }
+        }, 1000);
+    }
+
+    function moveTile(index) {
+        if (!gameActive) return;
+        
+        const r = Math.floor(index / gridSize), c = index % gridSize;
+        const er = Math.floor(emptyIndex / gridSize), ec = emptyIndex % gridSize;
+
+        if (Math.abs(r - er) + Math.abs(c - ec) === 1) {
+            // Swap
+            [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+            emptyIndex = index;
+            moves++;
+            
+            // Start Timer on first move if not running
+            if (moves === 1) startTimer();
+
+            updateStatsUI();
+            render();
+            
+            // Check Move Loss
+            if (limitMoves > 0 && moves >= limitMoves) {
+                // Check if they won on the very last allowed move
+                if (checkWinCondition()) {
+                    endGame(true);
+                } else {
+                    endGame(false, "Out of Moves!");
+                }
+                return;
+            }
+
+            // Check Win
+            if (checkWinCondition()) {
+                endGame(true);
+            }
+        }
+    }
+
+    function checkWinCondition() {
+        return tiles.every((t, i) => t === i);
+    }
+
+    function endGame(win, reason = "") {
+        gameActive = false;
+        clearInterval(timerInterval);
+        modal.style.display = 'flex';
+        
+        const title = document.getElementById('modalTitle');
+        const msg = document.getElementById('modalMsg');
+
+        if (win) {
+            title.textContent = "VICTORY!";
+            title.className = "modal-title win-title";
+            msg.textContent = `You solved the puzzle in ${moves} moves!`;
+        } else {
+            title.textContent = "GAME OVER";
+            title.className = "modal-title lose-title";
+            msg.textContent = reason || "Better luck next time.";
+        }
+    }
+
     function render() {
-        if (tiles.length === 0) return; // Guard clause
+        if (tiles.length === 0) return;
 
         const isMobile = window.innerWidth < 600;
         const totalSize = isMobile ? 300 : 450; 
-        
         const tileSize = totalSize / gridSize;
+        
         gridEl.style.gridTemplateColumns = `repeat(${gridSize}, ${tileSize}px)`;
         gridEl.style.gridTemplateRows = `repeat(${gridSize}, ${tileSize}px)`;
         gridEl.innerHTML = '';
@@ -338,18 +514,17 @@
             tile.style.width = `${tileSize}px`;
             tile.style.height = `${tileSize}px`;
 
-            if (tileValue === tiles.length - 1 && !solved) {
+            if (tileValue === tiles.length - 1 && gameActive) {
                 tile.classList.add('empty-tile');
             } else {
                 const row = Math.floor(tileValue / gridSize);
                 const col = tileValue % gridSize;
                 
-                // Use the processed canvas data
                 tile.style.backgroundImage = `url(${currentImageBase})`;
                 tile.style.backgroundSize = `${totalSize}px ${totalSize}px`;
                 tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
                 
-                if(!solved) {
+                if(gameActive) {
                     const num = document.createElement('span');
                     num.className = 'tile-number';
                     num.textContent = tileValue + 1;
@@ -361,34 +536,9 @@
         });
     }
 
-    function moveTile(index) {
-        if (solved) return;
-        const r = Math.floor(index / gridSize), c = index % gridSize;
-        const er = Math.floor(emptyIndex / gridSize), ec = emptyIndex % gridSize;
-
-        if (Math.abs(r - er) + Math.abs(c - ec) === 1) {
-            [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
-            emptyIndex = index;
-            moves++;
-            movesEl.textContent = moves;
-            if(!gameStarted) startTimer();
-            render();
-            checkWin();
-        }
-    }
-
-    function startTimer() {
-        gameStarted = true;
-        timerInterval = setInterval(() => {
-            seconds++;
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            timerEl.textContent = `${m}:${s}`;
-        }, 1000);
-    }
-
     function shuffleTiles() {
-        initGame();
+        initGameStats();
+        // Solvable shuffle
         for (let i = 0; i < gridSize * gridSize * 25; i++) {
             const neighbors = [];
             if (emptyIndex >= gridSize) neighbors.push(emptyIndex - gridSize);
@@ -402,94 +552,61 @@
         render();
     }
 
-    function checkWin() {
-        if (tiles.every((t, i) => t === i)) {
-            solved = true;
-            clearInterval(timerInterval);
-            render();
-            winMsg.style.display = 'block';
-        }
-    }
-
-    function changeLevel(size, btn) {
-        gridSize = size;
-        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        shuffleTiles();
-    }
-
-    // --- 2. IMAGE HANDLING LOGIC ---
+    // --- IMAGE HANDLING ---
 
     function loadDailyImage() {
         labelEl.textContent = "Daily Challenge";
         labelEl.style.background = "#00f3ff"; 
-        
         const date = new Date();
         const seed = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-        const url = `https://picsum.photos/seed/${seed}/800/800`;
-        
-        loadImageFromURL(url);
+        loadImageFromURL(`https://picsum.photos/seed/${seed}/800/800`);
     }
 
     function loadRandomImage() {
         labelEl.textContent = "Random Challenge";
         labelEl.style.background = "#bc13fe";
         const seed = Math.floor(Math.random() * 100000);
-        const url = `https://picsum.photos/seed/${seed}/800/800`;
-        loadImageFromURL(url);
+        loadImageFromURL(`https://picsum.photos/seed/${seed}/800/800`);
     }
 
     function loadImageFromURL(url) {
-        loader.style.display = 'block';
         previewImg.style.opacity = '0.3';
-        
         rawImage = new Image();
         rawImage.crossOrigin = "Anonymous"; 
-        
         rawImage.onload = () => {
-            loader.style.display = 'none';
             previewImg.style.opacity = '1';
             panRange.value = 50; 
             processImage();
-            shuffleTiles(); // New Image = Scramble
+            shuffleTiles(); // New Image = Reset Game
         };
-        
-        rawImage.onerror = () => {
-            alert("Failed to load image. Check internet connection.");
-        };
-        
         rawImage.src = url;
     }
 
     document.getElementById('imageUpload').onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
         labelEl.textContent = "Custom Upload";
         labelEl.style.background = "#fff";
-        
         const reader = new FileReader();
         reader.onload = (ev) => {
             rawImage = new Image();
             rawImage.onload = () => {
                 panRange.value = 50;
                 processImage();
-                shuffleTiles(); // New Upload = Scramble
+                shuffleTiles();
             };
             rawImage.src = ev.target.result;
         };
         reader.readAsDataURL(file);
     };
 
-    // When Slider moves, ONLY render (do not scramble)
     panRange.oninput = () => {
         processImage();
-        render(); 
+        render(); // Just re-draw, don't shuffle
     };
 
     function processImage() {
         if (!rawImage.src) return;
-
         const canvas = document.createElement('canvas');
         const size = 600; 
         canvas.width = size; canvas.height = size;
@@ -500,23 +617,19 @@
         let val = panRange.value / 100;
 
         if (rawImage.width > rawImage.height) {
-            const maxScroll = rawImage.width - minDim;
-            sx = maxScroll * val;
+            sx = (rawImage.width - minDim) * val;
         } else {
-            const maxScroll = rawImage.height - minDim;
-            sy = maxScroll * val;
+            sy = (rawImage.height - minDim) * val;
         }
 
         ctx.drawImage(rawImage, sx, sy, minDim, minDim, 0, 0, size, size);
-        
         currentImageBase = canvas.toDataURL();
         previewImg.src = currentImageBase;
-        // Does NOT call shuffleTiles() anymore
     }
 
-    // Keyboard Controls
+    // Keyboard
     document.addEventListener('keydown', (e) => {
-        if(solved) return;
+        if(!gameActive) return;
         let move = -1;
         if (e.key === 'ArrowUp' && emptyIndex < gridSize * (gridSize - 1)) move = emptyIndex + gridSize;
         if (e.key === 'ArrowDown' && emptyIndex >= gridSize) move = emptyIndex - gridSize;
@@ -524,8 +637,6 @@
         if (e.key === 'ArrowRight' && emptyIndex % gridSize !== 0) move = emptyIndex - 1;
         if (move !== -1) { e.preventDefault(); moveTile(move); }
     });
-
-    window.onload = loadDailyImage;
 
 </script>
 
