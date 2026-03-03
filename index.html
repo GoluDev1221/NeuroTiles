@@ -155,7 +155,14 @@
         .visual-hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .badge { background: var(--secondary); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         
-        .preview-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; max-height: 200px; }
+        /* UPDATED: Forced Square Aspect Ratio */
+        .preview-wrapper { 
+            position: relative; 
+            width: 100%; 
+            max-width: 250px; /* Ensures it doesn't get too big */
+            aspect-ratio: 1 / 1; /* Forces perfect square */
+            margin: 0 auto; /* Centers it */
+        }
         .preview-image { width: 100%; height: 100%; border-radius: 12px; border: 2px solid #333; object-fit: cover; }
         
         .crop-controls { background: #08080f; padding: 10px; border-radius: 10px; }
@@ -235,7 +242,7 @@
 <div class="main-container">
     <div id="homeScreen" class="screen active">
         <div class="brand-logo">🧠 Neuro<span>Tiles</span></div>
-        <h1 class="hero-title">Core<br><span>Crush</span></h1>
+        <h1 class="hero-title">Neuro<br><span>Tiles</span></h1>
         
         <div class="settings-grid">
             <div class="setting-box">
